@@ -164,7 +164,7 @@ if __name__ == "__main__":
           setup_requires=["wheel", "cachetools", "pefile", "packaging"],
           install_requires=["cachetools", "pefile"],
           platforms="Windows",
-          python_requires='>=3.8, <3.12',
+          python_requires='>=3.8, <3.13',
 
           classifiers=[
               "Development Status :: 4 - Beta",

@@ -3,7 +3,7 @@
 import pkg_resources
 from .dllfinder import Scanner, pydll
 
-import imp
+#import imp
 import io
 import logging
 import marshal

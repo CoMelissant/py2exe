@@ -185,6 +185,9 @@ class BuildInterpreters(build_ext):
         # Currently this is done in the setup script; should we do it
         # here?
 
+        print("start linking the DLL")
+        print(ext.target_desc)
+        print(ext_path)
         self.compiler.link(ext.target_desc,
                            objects, ext_path,
                            libraries=self.get_libraries(ext),

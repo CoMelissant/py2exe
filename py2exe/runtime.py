@@ -240,6 +240,9 @@ class Runtime(object):
             if target.exe_type in ("ctypes_comdll"):
                 # full path to exe-file
                 exe_path = os.path.join(destdir, dest_base + ".dll")
+            elif target.exe_type in ("shared_dll"):
+                # full path to exe-file
+                exe_path = os.path.join(destdir, dest_base + ".dll")
             else:
                 # full path to exe-file
                 exe_path = os.path.join(destdir, dest_base + ".exe")
@@ -312,6 +315,8 @@ class Runtime(object):
             run_stub = 'run_w%s-py%s.%s-%s.exe' % (RUNTIME_SUFFIX, sys.version_info[0], sys.version_info[1], get_platform())
         elif target.exe_type == "ctypes_comdll":
             run_stub = 'run_ctypes_dll%s-py%s.%s-%s.dll' % (RUNTIME_SUFFIX, sys.version_info[0], sys.version_info[1], get_platform())
+        elif target.exe_type == "shared_dll":
+            run_stub = 'runasdll%s-py%s.%s-%s.dll' % (RUNTIME_SUFFIX, sys.version_info[0], sys.version_info[1], get_platform())
         else:
             raise ValueError("Unknown exe_type %r" % target.exe_type)
         ## if self.options.verbose:
@@ -663,7 +668,7 @@ class Runtime(object):
                                 optimize=self.options.optimize)
             code_objects.append(boot_code)
 
-        elif target.exe_type in ("console_exe", "windows_exe"):
+        elif target.exe_type in ("console_exe", "windows_exe", "shared_dll"):
             boot_code = compile(pkgutil.get_data("py2exe", "boot_common.py"),
                                 "boot_common.py", "exec",
                                 optimize=self.options.optimize)

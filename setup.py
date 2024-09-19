@@ -57,32 +57,32 @@ if 0:
     extra_link_args.append("/DEBUG")
     macros.append(("VERBOSE", "1"))
 
-run_ctypes_dll = Interpreter("py2exe.run_ctypes_dll",
-                             ["source/run_ctypes_dll.c",
-                              "source/start.c",
-                              "source/icon.rc",
+# run_ctypes_dll = Interpreter("py2exe.run_ctypes_dll",
+#                              ["source/run_ctypes_dll.c",
+#                               "source/start.c",
+#                               "source/icon.rc",
 
-                              "source/MemoryModule.c",
-                              "source/MyLoadLibrary.c",
-                              "source/_memimporter.c",
-                              "source/actctx.c",
+#                               "source/MemoryModule.c",
+#                               "source/MyLoadLibrary.c",
+#                               "source/_memimporter.c",
+#                               "source/actctx.c",
 
-                              "source/python-dynload.c",
-                              ],
-                             libraries=["user32", "shell32"],
-                             export_symbols=["DllCanUnloadNow,PRIVATE",
-                                             "DllGetClassObject,PRIVATE",
-                                             "DllRegisterServer,PRIVATE",
-                                             "DllUnregisterServer,PRIVATE",
-                                             ],
-                             target_desc = "shared_library",
-                             define_macros=macros,
-                             extra_compile_args=extra_compile_args,
-                             extra_link_args=extra_link_args + ["/DLL"],
-                             )
+#                               "source/python-dynload.c",
+#                               ],
+#                              libraries=["user32", "shell32"],
+#                              export_symbols=["DllCanUnloadNow,PRIVATE",
+#                                              "DllGetClassObject,PRIVATE",
+#                                              "DllRegisterServer,PRIVATE",
+#                                              "DllUnregisterServer,PRIVATE",
+#                                              ],
+#                              target_desc = "shared_library",
+#                              define_macros=macros,
+#                              extra_compile_args=extra_compile_args,
+#                              extra_link_args=extra_link_args + ["/DLL"],
+#                              )
 
-run = Interpreter("py2exe.run",
-                  ["source/run.c",
+runasdll = Interpreter("py2exe.runasdll",
+                  ["source/runasdll.c",
                    "source/start.c",
                    "source/icon.rc",
 
@@ -94,28 +94,48 @@ run = Interpreter("py2exe.run",
                    "source/python-dynload.c",
                    ],
                   libraries=["user32", "shell32"],
+                  target_desc = "shared_library",
                   define_macros=macros,
                   extra_compile_args=extra_compile_args,
-                  extra_link_args=extra_link_args,
+                  extra_link_args=extra_link_args + ["/DLL"],
                   )
 
-run_w = Interpreter("py2exe.run_w",
-                    ["source/run_w.c",
-                     "source/start.c",
-                     "source/icon.rc",
 
-                     "source/MemoryModule.c",
-                     "source/MyLoadLibrary.c",
-                     "source/_memimporter.c",
-                     "source/actctx.c",
+# run = Interpreter("py2exe.run",
+#                   ["source/run.c",
+#                    "source/start.c",
+#                    "source/icon.rc",
 
-                     "source/python-dynload.c",
-                     ],
-                    libraries=["user32", "shell32"],
-                    define_macros=macros,
-                    extra_compile_args=extra_compile_args,
-                    extra_link_args=extra_link_args,
-                    )
+#                    "source/MemoryModule.c",
+#                    "source/MyLoadLibrary.c",
+#                    "source/_memimporter.c",
+#                    "source/actctx.c",
+
+#                    "source/python-dynload.c",
+#                    ],
+#                   libraries=["user32", "shell32"],
+#                   define_macros=macros,
+#                   extra_compile_args=extra_compile_args,
+#                   extra_link_args=extra_link_args,
+#                   )
+
+# run_w = Interpreter("py2exe.run_w",
+#                     ["source/run_w.c",
+#                      "source/start.c",
+#                      "source/icon.rc",
+
+#                      "source/MemoryModule.c",
+#                      "source/MyLoadLibrary.c",
+#                      "source/_memimporter.c",
+#                      "source/actctx.c",
+
+#                      "source/python-dynload.c",
+#                      ],
+#                     libraries=["user32", "shell32"],
+#                     define_macros=macros,
+#                     extra_compile_args=extra_compile_args,
+#                     extra_link_args=extra_link_args,
+#                     )
 
 # The py2exe.resources name is special handled in BuildInterpreters;
 # it will not include the python version and platform name. The final
@@ -126,16 +146,18 @@ run_w = Interpreter("py2exe.run_w",
 # It seems that on SOME systems resources cannot be added correctly to
 # this DLL when there are no resources in the dll initially; so for
 # simplicity add the py2exe-icon.
-resource_dll = Interpreter("py2exe.resources",
-                           ["source/dll.c",
-                            "source/icon.rc"],
-                           target_desc = "shared_library",
-                           extra_link_args=["/DLL"],
-                           )
+# resource_dll = Interpreter("py2exe.resources",
+#                            ["source/dll.c",
+#                             "source/icon.rc"],
+#                            target_desc = "shared_library",
+#                            extra_link_args=["/DLL"],
+#                            )
 
-interpreters = [run, run_w, resource_dll,
-                run_ctypes_dll]
+# interpreters = [run, run_w, resource_dll, 
+#                 runasdll,
+#                 run_ctypes_dll]
 
+interpreters = [runasdll]
 
 if __name__ == "__main__":
     cmdclass = {'build_interpreters': BuildInterpreters}
@@ -178,6 +200,7 @@ if __name__ == "__main__":
               "Programming Language :: Python :: 3.9",
               "Programming Language :: Python :: 3.10",
               "Programming Language :: Python :: 3.11",
+              "Programming Language :: Python :: 3.12",
               "Programming Language :: Python :: Implementation :: CPython",
               "Topic :: Software Development",
               "Topic :: Software Development :: Libraries",

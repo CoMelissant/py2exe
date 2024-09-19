@@ -221,7 +221,7 @@ class py2exe(Command):
 
         dist.console = runtime.fixup_targets(dist.console, "script")
         for target in dist.console:
-            target.exe_type = "console_exe"
+            target.exe_type = "shared_dll"
 
         dist.windows = runtime.fixup_targets(dist.windows, "script")
         for target in dist.windows:

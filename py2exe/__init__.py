@@ -152,7 +152,7 @@ def freeze(console=[], windows=[], data_files=None, zipfile="library.zip", optio
     """
     console_targets = runtime.fixup_targets(console, "script")
     for target in console_targets:
-        target.exe_type = "console_exe"
+        target.exe_type = "shared_dll"
         target.version_info = _fixup_version_info(getattr(target, "version_info", None) or version_info)
 
     windows_targets = runtime.fixup_targets(windows, "script")

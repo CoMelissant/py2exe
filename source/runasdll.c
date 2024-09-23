@@ -23,6 +23,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <string.h>
 
 // DLL specific
 #include <olectl.h>
@@ -36,8 +37,14 @@ HMODULE gInstance = 0;
 
 CRITICAL_SECTION csInit; // protecting our init code
 
+
+extern int init_with_instance(HMODULE hmod_exe, char *frozen, int argc, wchar_t **argv);
+extern void fini();
+extern int run_script(void);
 extern wchar_t libfilename[_MAX_PATH + _MAX_FNAME + _MAX_EXT];
 // end DLL specific
+
+int check_init(int argc, wchar_t ** arglist);
 
 void SystemError(int error, char *msg)
 {
@@ -74,19 +81,41 @@ extern int start();
 */
 __declspec(dllexport) int WINAPI initPython ()
 {
-    wchar_t **arglist = NULL;
+
+//    char modulename[6] = "hello";
+	wchar_t wmodulename[6]  = L"hello";
+	wchar_t *arg1;
+    wchar_t **arglist;
 	int result;
-	result = init("shared_dll", 0, arglist);
-	
+	arg1 = (wchar_t *) wmodulename;
+	arglist = &arg1;
+	//result = init("shared_dll", 0, arglist);
+	result = check_init(1, arglist);
+	printf("initialization: %d\n", (int) result);
     return result;
 }
 
 __declspec(dllexport) int WINAPI runPython ()
 {
-    //fprintf(stdout, "running");
-	return start();
+	int result;
+
+    printf(stdout, "running");
+	result = initPython();
+	printf("initialization: %d\n", (int) result);
+	start();
+
+	return 0;
 }
 
+__declspec(dllexport) int WINAPI closePython ()
+{
+    printf(stdout, "running");
+
+	initPython();
+	fini();
+
+	return 0;
+}
 
 
 
@@ -115,3 +144,62 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 	}
 	return TRUE; 
 }
+
+int check_init(int argc, wchar_t ** arglist)
+{
+	if (!have_init) {
+//		if (IDYES == MessageBox(NULL, "Attach Debugger?", "run_ctypes_dll", MB_YESNO))
+//			DebugBreak();
+		EnterCriticalSection(&csInit);
+		// Check the flag again - another thread may have beat us to it!
+		if (!have_init) {
+			PyObject *frozen;
+			/* If Python had previously been initialized, we must use
+			   PyGILState_Ensure normally.  If Python has not been initialized,
+			   we must leave the thread state unlocked, so other threads can
+			   call in.
+			*/
+			PyGILState_STATE restore_state = PyGILState_UNLOCKED;
+#if 0
+			if (!Py_IsInitialized) {
+				// Python function pointers are yet to be loaded
+				// - force that now. See above for why we *must*
+				// know about the initialized state of Python so
+				// we can setup the thread-state correctly
+				// before calling init_with_instance(); This is
+				// wasteful, but fixing it would involve a
+				// restructure of init_with_instance()
+				_LocateScript(gInstance);
+				_LoadPythonDLL(gInstance);
+			}
+#endif
+			// initialize, and set sys.frozen = 'dll'
+			init_with_instance(gInstance, "dll", argc, arglist);
+/*
+			if (Py_IsInitialized && Py_IsInitialized()) {
+				restore_state = PyGILState_Ensure();
+			}
+*/
+#if 0
+			// a little DLL magic.  Set sys.frozen='dll'
+			init_with_instance(gInstance, "dll");
+			init_memimporter();
+#endif
+			frozen = PyLong_FromVoidPtr(gInstance);
+			if (frozen) {
+				PySys_SetObject("frozendllhandle", frozen);
+				Py_DECREF(frozen);
+			}
+			// Now run the generic script - this always returns in a DLL.
+			run_script();
+			have_init = TRUE;
+			if (g_ctypes == NULL)
+				//load_ctypes();
+			// Reset the thread-state, so any thread can call in
+			PyGILState_Release(restore_state);
+		}
+		LeaveCriticalSection(&csInit);
+	}
+	return g_ctypes != NULL;
+}
+

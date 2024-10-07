@@ -50,11 +50,12 @@ extra_compile_args.append("-IC:\\Program Files\\Microsoft SDKs\\Windows\\v7.0\\I
 extra_compile_args.append("-IC:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include")
 extra_compile_args.append("-IC:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10586.0\\ucrt")
 
-if 0:
+if 1:
     # enable this to debug a release build
     extra_compile_args.append("/Od")
     extra_compile_args.append("/Z7")
     extra_link_args.append("/DEBUG")
+    extra_link_args.append("/Z7")
     macros.append(("VERBOSE", "1"))
 
 # run_ctypes_dll = Interpreter("py2exe.run_ctypes_dll",
@@ -146,18 +147,19 @@ runasdll = Interpreter("py2exe.runasdll",
 # It seems that on SOME systems resources cannot be added correctly to
 # this DLL when there are no resources in the dll initially; so for
 # simplicity add the py2exe-icon.
-# resource_dll = Interpreter("py2exe.resources",
-#                            ["source/dll.c",
-#                             "source/icon.rc"],
-#                            target_desc = "shared_library",
-#                            extra_link_args=["/DLL"],
-#                            )
+
+resource_dll = Interpreter("py2exe.resources",
+                           ["source/dll.c",
+                            "source/icon.rc"],
+                           target_desc = "shared_library",
+                           extra_link_args=["/DLL"],
+                           )
 
 # interpreters = [run, run_w, resource_dll, 
 #                 runasdll,
 #                 run_ctypes_dll]
 
-interpreters = [runasdll]
+interpreters = [runasdll, resource_dll]
 
 if __name__ == "__main__":
     cmdclass = {'build_interpreters': BuildInterpreters}

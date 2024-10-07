@@ -626,10 +626,11 @@ class Runtime(object):
         # sys.executable has already been set in the run-stub
 
         # XXX should this be done in the exe-stub?
-        code_objects.append(
-            compile("import os, sys; sys.base_prefix = sys.prefix = os.path.dirname(sys.executable); del os, sys",
+        basecode = compile("import os, sys; sys.base_prefix = sys.prefix = os.path.dirname(sys.executable); del os, sys",
                     "<bootstrap2>", "exec",
-                    optimize=self.options.optimize))
+                    optimize=self.options.optimize)
+        code_objects.append(basecode)
+    
 
         if self.options.bundle_files < 3:
             # XXX do we need this one?
@@ -676,10 +677,10 @@ class Runtime(object):
             code_objects.append(boot_code)
 
             with open(target.script, "rb") as script_file:
-                code_objects.append(
-                    compile(script_file.read() + b"\n",
+                script_code = compile(script_file.read() + b"\n",
                             os.path.basename(target.script), "exec",
-                            optimize=self.options.optimize))
+                            optimize=self.options.optimize)
+                code_objects.append(script_code)
 
         elif target.exe_type == "ctypes_comdll":
             code_objects.append(

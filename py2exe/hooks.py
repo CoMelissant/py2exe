@@ -452,7 +452,7 @@ def hook_mpl_toolkits(finder, module):
 
     if mpl_version >= pkgversion.parse('3.7.0'):
 
-        #import mpl_toolkits
+        import mpl_toolkits
 
         tree = ast.parse(module.__source__)
         devel_node_to_be_patched = '_delvewheel_init_patch'
@@ -466,7 +466,7 @@ def hook_mpl_toolkits(finder, module):
         t = ChangeDef()
         patched_tree = t.visit(tree)
 
-        module.__code_object__ = compile(patched_tree, module.__file__, "exec", optimize=module.__optimize__)
+        module.__code_object__ = compile(patched_tree, module.__path__[0], "exec", optimize=module.__optimize__)
 
 
 def hook_numpy(finder, module):

@@ -24,8 +24,8 @@ from py2exe_setuptools import Dist, Interpreter, BuildInterpreters
 ############################################################################
 
 if 'MSC' in sys.version:
-python_dll_name = '\"python%d%d.dll\"' % sys.version_info[:2]
-python_dll_name_debug = '\"python%d%d_d.dll\"' % sys.version_info[:2]
+    python_dll_name = '\"python%d%d.dll\"' % sys.version_info[:2]
+    python_dll_name_debug = '\"python%d%d_d.dll\"' % sys.version_info[:2]
 else:
     python_dll_name = '\"libpython%d.%d.dll\"' % sys.version_info[:2]
     python_dll_name_debug = '\"libpython%d.%d_d.dll\"' % sys.version_info[:2]
